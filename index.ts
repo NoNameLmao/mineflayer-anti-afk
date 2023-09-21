@@ -107,7 +107,8 @@ export function antiAfk(bot: Bot) {
         hit({ attackMobs, interval = 1000 }) {
             status.hit = true
             if (attackMobs) {
-                const closestMob = bot.nearestEntity(entity => entity.type === 'mob')
+                const excludedTypes = ['object', 'player', 'global', 'orb', 'other']
+                const closestMob = bot.nearestEntity(entity => !excludedTypes.includes(entity.type))
                 if (closestMob) bot.attack(closestMob)
             } else {
                 const hitIntervalId = setInterval(() => {
