@@ -1,5 +1,7 @@
 import { pathfinder, goals } from 'mineflayer-pathfinder'
 import { Bot } from 'mineflayer'
+
+// bot.loadPlugin(antiAfk)
 export function antiAfk(bot: Bot) {
     if (!bot.pathfinder) bot.loadPlugin(pathfinder)
     let status = {
@@ -132,6 +134,9 @@ declare module 'mineflayer' {
                 autoMessage: boolean
                 rotate: boolean
                 circleWalk: boolean
+                sneak: boolean
+                jump: boolean
+                hit: boolean
             }
             /**
              * Turns off the specified module
