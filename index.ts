@@ -2,15 +2,18 @@ import { pathfinder } from 'mineflayer-pathfinder'
 import { Bot } from 'mineflayer'
 export function antiAfk(bot: Bot) {
     if (!bot.pathfinder) bot.loadPlugin(pathfinder)
+    let status = {
+        rotate: false,
+        autoMessage: false
+    }
     bot.antiAfk = {
-        status: {
-            rotate: false,
-            autoMessage: false
+        get status() {
+            return {...status}
         },
         off(module) {
-            this.status[module] = false
+            status[module] = false
         },
-        autoMessage(messages, delay, chat) {
+        autoMessage(messages, delay, chat = bot.chat) {
             this.status.autoMessage = true
             let i = 0
             let intervalId = setInterval(() => {
@@ -52,11 +55,12 @@ export function antiAfk(bot: Bot) {
     }
 }
 
+// for intellisense after inject after loading this as plugin
 declare module 'mineflayer' {
     interface Bot {
         antiAfk: {
-            /** Status of mineflayer-anti-afk's "modules". true = running */
-            status: {
+            /** Status of mineflayer-anti-afk's "modules". true = running. use `bot.antiAfk.off(module)` to toggle them off */
+            readonly status: {
                 autoMessage: boolean
                 rotate: boolean
             }
@@ -69,9 +73,9 @@ declare module 'mineflayer' {
              * Automatically send messages every once in *delay* milliseconds
              * @param {string[]} messages Array of messages
              * @param {number} delay Delay inbetween each message (in milliseconds)
-             * @param {function} chat Function to send chat messages, must accept a string as first parameter
+             * @param {function} chat Function to send chat messages, must accept a string as first parameter. Defaults to `bot.chat`.
              */
-            autoMessage: (messages: string[], delay: number, chat: (msg: string) => void) => void
+            autoMessage: (messages: string[], delay: number, chat: (msg: string) => any) => void
             /**
              * Rotates the bot in the specified direction every *interval* milliseconds
              * @param {RotateDirection} direction Direction to rotate
