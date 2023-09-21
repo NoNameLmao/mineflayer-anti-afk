@@ -1,0 +1,15 @@
+{
+  "name": "mineflayer-anti-afk",
+  "version": "0.0.1",
+  "description": "Add anti-afk capabilities to your mineflayer bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mineflayer",
+    "anti-afk"
+  ],
+  "author": "emberglaze",
+  "license": "MIT"
+}
