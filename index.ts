@@ -4,10 +4,13 @@ export function antiAfk(bot: Bot) {
     if (!bot.pathfinder) bot.loadPlugin(pathfinder)
     bot.antiAfk = {
         status: {
-            autoMessage: false,
-            rotate: false
+            rotate: false,
+            autoMessage: false
         },
-        autoMessage(messages, delay) {
+        off(module) {
+            this.status[module] = false
+        },
+        autoMessage(messages, delay, chat) {
             this.status.autoMessage = true
             let i = 0
             let intervalId = setInterval(() => {
@@ -15,7 +18,7 @@ export function antiAfk(bot: Bot) {
                     clearInterval(intervalId)
                     return
                 }
-                bot.chat(`${messages[i]}`) // force string
+                chat(`${messages[i]}`) // force string
                 if (i + 1 === messages.length) i = 0
                 else i++
             }, delay)
@@ -52,16 +55,23 @@ export function antiAfk(bot: Bot) {
 declare module 'mineflayer' {
     interface Bot {
         antiAfk: {
+            /** Status of mineflayer-anti-afk's "modules". true = running */
             status: {
                 autoMessage: boolean
                 rotate: boolean
             }
             /**
+             * Turns off the specified module
+             * @param {Module} module The module to turn off
+             */
+            off: (module: Module) => void
+            /**
              * Automatically send messages every once in *delay* milliseconds
              * @param {string[]} messages Array of messages
              * @param {number} delay Delay inbetween each message (in milliseconds)
+             * @param {function} chat Function to send chat messages, must accept a string as first parameter
              */
-            autoMessage: (messages: string[], delay: number) => void
+            autoMessage: (messages: string[], delay: number, chat: (msg: string) => void) => void
             /**
              * Rotates the bot in the specified direction every *interval* milliseconds
              * @param {RotateDirection} direction Direction to rotate
@@ -75,3 +85,4 @@ declare module 'mineflayer' {
 
 type Coordinates = { x: number, y: number, z: number }
 type RotateDirection = 'up' | 'down' | 'left' | 'right'
+type Module = 'autoMessage' | 'rotate'
