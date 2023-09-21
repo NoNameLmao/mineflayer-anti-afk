@@ -1,6 +1,6 @@
 {
   "name": "@emberglaze/mineflayer-anti-afk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Add anti-afk capabilities to your mineflayer bot",
   "main": "index.js",
   "scripts": {
