@@ -1,4 +1,4 @@
-import { goals, pathfinder } from 'mineflayer-pathfinder'
+import { pathfinder } from 'mineflayer-pathfinder'
 import { Bot } from 'mineflayer'
 export function antiAfk(bot: Bot) {
     if (!bot.pathfinder) bot.loadPlugin(pathfinder)
@@ -12,8 +12,8 @@ export function antiAfk(bot: Bot) {
             let i = 0
             let intervalId = setInterval(() => {
                 if (!this.status.autoMessage) {
-                    clearInterval(intervalId);
-                    return;
+                    clearInterval(intervalId)
+                    return
                 }
                 bot.chat(`${messages[i]}`) // force string
                 if (i + 1 === messages.length) i = 0
@@ -21,9 +21,14 @@ export function antiAfk(bot: Bot) {
             }, delay)
         },
         rotate(direction, increment = 1, interval = 100) {
+            this.status.rotate = true
             let yaw = bot.entity.yaw
             let pitch = bot.entity.pitch
-            setInterval(() => {
+            let intervalId = setInterval(() => {
+                if (!this.status.rotate) {
+                    clearInterval(intervalId)
+                    return
+                }
                 switch (direction) {
                     case 'up':
                         pitch -= increment
