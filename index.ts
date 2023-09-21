@@ -6,7 +6,8 @@ export function antiAfk(bot: Bot) {
         rotate: false,
         autoMessage: false,
         circleWalk: false,
-        sneak: false
+        sneak: false,
+        jump: false
     }
     bot.antiAfk = {
         get status() {
@@ -89,6 +90,19 @@ export function antiAfk(bot: Bot) {
                 }, sneakTime)
             }, interval)
         },
+        jump(interval) {
+            status.jump = true
+            let jumpIntervalId = setInterval(() => {
+                if (!status.jump) {
+                    clearInterval(jumpIntervalId)
+                    return
+                }
+                bot.setControlState('jump', true)
+                setTimeout(() => {
+                    bot.setControlState('jump', false)
+                }, interval)
+            }, interval)
+        },
     }
 }
 
@@ -134,6 +148,11 @@ declare module 'mineflayer' {
              * @param interval Frequency of the sneaking, in milliseconds
              */
             sneak: (sneakTime?: number, interval?: number) => void
+            /**
+             * Makes the bot jump every *interval* milliseconds
+             * @param {number} interval Delay between each jump (in milliseconds)
+             */
+            jump: (interval: number) => void
         }
     }
 }
