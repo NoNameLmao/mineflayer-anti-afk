@@ -7,7 +7,8 @@ export function antiAfk(bot: Bot) {
         autoMessage: false,
         circleWalk: false,
         sneak: false,
-        jump: false
+        jump: false,
+        hit: false
     }
     bot.antiAfk = {
         get status() {
@@ -103,6 +104,24 @@ export function antiAfk(bot: Bot) {
                 }, interval)
             }, interval)
         },
+        hit({ attackMobs, interval }) {
+            if (attackMobs === undefined && interval === undefined) {
+                throw new Error("Both parameters cannot be undefined");
+            }
+            status.hit = true
+            if (attackMobs) {
+                const closestMob = bot.nearestEntity(entity => entity.type === 'mob')
+                if (closestMob) bot.attack(closestMob)
+            } else if (interval !== undefined) {
+                const hitIntervalId = setInterval(() => {
+                    if (!status.hit) {
+                        clearInterval(hitIntervalId)
+                        return
+                    }
+                    bot.swingArm('right', true)
+                }, interval)
+            }
+        }
     }
 }
 
@@ -153,10 +172,11 @@ declare module 'mineflayer' {
              * @param {number} interval Delay between each jump (in milliseconds)
              */
             jump: (interval: number) => void
+            hit: ({ attackMobs, interval }: { attackMobs?: boolean, interval?: number }) => void
         }
     }
 }
 
 type Coordinates = { x: number, y: number, z: number }
 type RotateDirection = 'up' | 'down' | 'left' | 'right'
-type Module = 'autoMessage' | 'rotate' | 'circleWalk'
+type Module = 'autoMessage' | 'rotate' | 'circleWalk' | 'sneak' | 'jump' | 'hit'
