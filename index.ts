@@ -104,15 +104,12 @@ export function antiAfk(bot: Bot) {
                 }, interval)
             }, interval)
         },
-        hit({ attackMobs, interval }) {
-            if (attackMobs === undefined && interval === undefined) {
-                throw new Error("Both parameters cannot be undefined");
-            }
+        hit({ attackMobs, interval = 1000 }) {
             status.hit = true
             if (attackMobs) {
                 const closestMob = bot.nearestEntity(entity => entity.type === 'mob')
                 if (closestMob) bot.attack(closestMob)
-            } else if (interval !== undefined) {
+            } else {
                 const hitIntervalId = setInterval(() => {
                     if (!status.hit) {
                         clearInterval(hitIntervalId)
@@ -172,7 +169,13 @@ declare module 'mineflayer' {
              * @param {number} interval Delay between each jump (in milliseconds)
              */
             jump: (interval: number) => void
-            hit: ({ attackMobs, interval }: { attackMobs?: boolean, interval?: number }) => void
+            /**
+             * Makes the bot hit mobs or swing arm based on the parameters provided
+             * @param {Object} options Options for the hit function
+             * @param {boolean} options.attackMobs If true, the bot will attack the nearest mob
+             * @param {number} options.interval If attackMobs is false, the bot will swing its arm every interval milliseconds. Defaults to 1000 if neither parameters were provided.
+             */
+            hit: ({ attackMobs, interval = 1000 }: { attackMobs?: boolean, interval?: number }) => void
         }
     }
 }
