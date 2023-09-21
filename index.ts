@@ -76,7 +76,7 @@ export function antiAfk(bot: Bot) {
                 i++
             }, 1000)
         },
-        sneak(sneakTime, interval) {
+        sneak(sneakTime = 500, interval = 500) {
             status.sneak = true
             let sneakIntervalId = setInterval(() => {
                 if (!status.sneak) {
@@ -88,7 +88,6 @@ export function antiAfk(bot: Bot) {
                     bot.setControlState('sneak', false)
                 }, sneakTime)
             }, interval)
-            
         },
     }
 }
