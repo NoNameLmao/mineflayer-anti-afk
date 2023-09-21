@@ -68,9 +68,6 @@ bot.antiAfk.off('autoMessage') // Turns off auto message
 
 ## Installation
 
-Not yet published to npm registry. What you can do though:
-
 ```bash
-# download tarball directly from github and install with npm
-npm install https://github.com/NoNameLmao/mineflayer-anti-afk/tarball/main
+npm install @emberglaze/mineflayer-anti-afk
 ```
