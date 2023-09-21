@@ -55,6 +55,7 @@ export function antiAfk(bot: Bot) {
         },
         circleWalk(radius) {
             const { x, y, z } = bot.entity.position
+            // ehh tbh with 4 points thats a square inside of the intended circle
             const points = [
                 [x + radius, y, z],
                 [x, y, z + radius],
@@ -100,6 +101,10 @@ declare module 'mineflayer' {
              * @param {number} interval Delay between each rotation (in milliseconds) (default: 100)
              */
             rotate: (direction: RotateDirection, increment?: number, interval?: number) => void
+            /**
+             * Makes the bot walk in a circle with the specified radius
+             * @param {number} radius The radius of the circle
+             */
             circleWalk: (radius: number) => void
         }
     }
