@@ -5,7 +5,8 @@ export function antiAfk(bot: Bot) {
     let status = {
         rotate: false,
         autoMessage: false,
-        circleWalk: false
+        circleWalk: false,
+        sneak: false
     }
     bot.antiAfk = {
         get status() {
@@ -75,6 +76,20 @@ export function antiAfk(bot: Bot) {
                 i++
             }, 1000)
         },
+        sneak(sneakTime, interval) {
+            status.sneak = true
+            let sneakIntervalId = setInterval(() => {
+                if (!status.sneak) {
+                    clearInterval(sneakIntervalId)
+                    return
+                }
+                bot.setControlState('sneak', true)
+                setTimeout(() => {
+                    bot.setControlState('sneak', false)
+                }, sneakTime)
+            }, interval)
+            
+        },
     }
 }
 
@@ -114,6 +129,12 @@ declare module 'mineflayer' {
              * @param {Coordinates} pos The position of the circle's center. Defaults to `bot.entity.position`
              */
             circleWalk: (radius: number, points: number, pos: Coordinates) => void
+            /**
+             * Make the bot sneak for "sneakTime" every "interval" milliseconds
+             * @param sneakTime How long for the bot to sneak every time
+             * @param interval Frequency of the sneaking, in milliseconds
+             */
+            sneak: (sneakTime?: number, interval?: number) => void
         }
     }
 }
