@@ -53,19 +53,25 @@ export function antiAfk(bot: Bot) {
                 bot.look(yaw, pitch)
             }, interval)
         },
-        circleWalk(radius) {
-            const { x, y, z } = bot.entity.position
-            // ehh tbh with 4 points thats a square inside of the intended circle
-            const points = [
-                [x + radius, y, z],
-                [x, y, z + radius],
-                [x - radius, y, z],
-                [x, y, z - radius],
-            ]
+        circleWalk(radius, points, pos = bot.entity.position) {
+            status.circleWalk = true
+            const angleStep = (2 * Math.PI) / points
+            const result: Coordinates[] = []
+            for (let i = 0; i < points; i++) {
+                const angle = i * angleStep
+                const x = pos.x + radius * Math.cos(angle)
+                const y = pos.y
+                const z = pos.z + radius * Math.sin(angle)
+                result.push({ x, y, z })
+            }
             let i = 0
-            setInterval(() => {
-                if(i === points.length) i = 0
-                bot.pathfinder.setGoal(new goals.GoalXZ(points[i][0], points[i][2]))
+            const intervalId = setInterval(() => {
+                if (!status.circleWalk) {
+                    clearInterval(intervalId);
+                    return;
+                }
+                if (i === result.length) i = 0
+                bot.pathfinder.setGoal(new goals.GoalXZ(result[i].x, result[i].z))
                 i++
             }, 1000)
         },
@@ -102,14 +108,16 @@ declare module 'mineflayer' {
              */
             rotate: (direction: RotateDirection, increment?: number, interval?: number) => void
             /**
-             * Makes the bot walk in a circle with the specified radius
+             * Makes the bot walk in a circle with the specified radius, number of points, and position
              * @param {number} radius The radius of the circle
+             * @param {number} points The number of points in the circle
+             * @param {Coordinates} pos The position of the circle's center. Defaults to `bot.entity.position`
              */
-            circleWalk: (radius: number) => void
+            circleWalk: (radius: number, points: number, pos: Coordinates) => void
         }
     }
 }
 
 type Coordinates = { x: number, y: number, z: number }
 type RotateDirection = 'up' | 'down' | 'left' | 'right'
-type Module = 'autoMessage' | 'rotate'
+type Module = 'autoMessage' | 'rotate' | 'circleWalk'
