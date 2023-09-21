@@ -1,10 +1,11 @@
-import { pathfinder } from 'mineflayer-pathfinder'
+import { pathfinder, goals } from 'mineflayer-pathfinder'
 import { Bot } from 'mineflayer'
 export function antiAfk(bot: Bot) {
     if (!bot.pathfinder) bot.loadPlugin(pathfinder)
     let status = {
         rotate: false,
-        autoMessage: false
+        autoMessage: false,
+        circleWalk: false
     }
     bot.antiAfk = {
         get status() {
@@ -52,6 +53,21 @@ export function antiAfk(bot: Bot) {
                 bot.look(yaw, pitch)
             }, interval)
         },
+        circleWalk(radius) {
+            const { x, y, z } = bot.entity.position
+            const points = [
+                [x + radius, y, z],
+                [x, y, z + radius],
+                [x - radius, y, z],
+                [x, y, z - radius],
+            ]
+            let i = 0
+            setInterval(() => {
+                if(i === points.length) i = 0
+                bot.pathfinder.setGoal(new goals.GoalXZ(points[i][0], points[i][2]))
+                i++
+            }, 1000)
+        },
     }
 }
 
@@ -63,6 +79,7 @@ declare module 'mineflayer' {
             readonly status: {
                 autoMessage: boolean
                 rotate: boolean
+                circleWalk: boolean
             }
             /**
              * Turns off the specified module
@@ -83,6 +100,7 @@ declare module 'mineflayer' {
              * @param {number} interval Delay between each rotation (in milliseconds) (default: 100)
              */
             rotate: (direction: RotateDirection, increment?: number, interval?: number) => void
+            circleWalk: (radius: number) => void
         }
     }
 }
