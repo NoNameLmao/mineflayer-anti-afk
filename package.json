@@ -11,5 +11,13 @@
     "anti-afk"
   ],
   "author": "emberglaze",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "mineflayer": "^4.14.0"
+  },
+  "dependencies": {
+    "mineflayer-pathfinder": "^2.4.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
 }
