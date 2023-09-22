@@ -19,25 +19,31 @@ export function antiAfk(bot: Bot) {
         off(module) {
             status[module] = false
         },
-        autoMessage(messages, delay, chat = bot.chat) {
-            this.status.autoMessage = true
+        autoMessage(messages, delay, random, chat = bot.chat) {
+            status.autoMessage = true
             let i = 0
-            let intervalId = setInterval(() => {
-                if (!this.status.autoMessage) {
+            const intervalId = setInterval(() => {
+                if (!status.autoMessage) {
                     clearInterval(intervalId)
                     return
                 }
-                chat(`${messages[i]}`) // force string
-                if (i + 1 === messages.length) i = 0
-                else i++
+                
+                if (random) {
+                    const randomIndex = Math.floor(Math.random() * messages.length);
+                    chat(messages[randomIndex]);
+                } else {
+                    chat(messages[i]);
+                    if (i + 1 === messages.length) i = 0
+                    else i++
+                }
             }, delay)
         },
         rotate(direction, increment = 1, interval = 100) {
-            this.status.rotate = true
+            status.rotate = true
             let yaw = bot.entity.yaw
             let pitch = bot.entity.pitch
-            let intervalId = setInterval(() => {
-                if (!this.status.rotate) {
+            const intervalId = setInterval(() => {
+                if (!status.rotate) {
                     clearInterval(intervalId)
                     return
                 }
@@ -55,7 +61,7 @@ export function antiAfk(bot: Bot) {
                         yaw += increment
                         break
                 }
-                bot.look(yaw, pitch)
+                bot.look(yaw, pitch, true)
             }, interval)
         },
         circleWalk(radius, points, pos = bot.entity.position) {
@@ -91,7 +97,7 @@ export function antiAfk(bot: Bot) {
                 setTimeout(() => {
                     bot.setControlState('sneak', false)
                 }, sneakTime)
-            }, interval)
+            }, interval + sneakTime)
         },
         jump(interval) {
             status.jump = true
@@ -101,9 +107,7 @@ export function antiAfk(bot: Bot) {
                     return
                 }
                 bot.setControlState('jump', true)
-                setTimeout(() => {
-                    bot.setControlState('jump', false)
-                }, interval)
+                bot.setControlState('jump', false)
             }, interval)
         },
         hit({ attackMobs, interval = 1000 }) {
@@ -111,7 +115,10 @@ export function antiAfk(bot: Bot) {
             if (attackMobs) {
                 const excludedTypes = ['object', 'player', 'global', 'orb', 'other']
                 const closestMob = bot.nearestEntity(entity => !excludedTypes.includes(entity.type))
-                if (closestMob) bot.attack(closestMob)
+                if (closestMob) {
+                    bot.pathfinder.setGoal(new goals.GoalFollow(closestMob, 1))
+                    bot.attack(closestMob)
+                }
             } else {
                 const hitIntervalId = setInterval(() => {
                     if (!status.hit) {
@@ -149,7 +156,7 @@ declare module 'mineflayer' {
              * @param {number} delay Delay inbetween each message (in milliseconds)
              * @param {function} chat Function to send chat messages, must accept a string as first parameter. Defaults to `bot.chat`.
              */
-            autoMessage: (messages: string[], delay: number, chat: (msg: string) => any) => void
+            autoMessage: (messages: string[], delay: number, random: boolean, chat?: (msg: string) => any) => void
             /**
              * Rotates the bot in the specified direction every *interval* milliseconds
              * @param {RotateDirection} direction Direction to rotate
@@ -163,7 +170,7 @@ declare module 'mineflayer' {
              * @param {number} points The number of points in the circle
              * @param {Coordinates} pos The position of the circle's center. Defaults to `bot.entity.position`
              */
-            circleWalk: (radius: number, points: number, pos: Coordinates) => void
+            circleWalk: (radius: number, points: number, pos?: Coordinates) => void
             /**
              * Make the bot sneak for "sneakTime" every "interval" milliseconds
              * @param sneakTime How long for the bot to sneak every time

@@ -1,10 +1,10 @@
 {
   "name": "@emberglaze/mineflayer-anti-afk",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Add anti-afk capabilities to your mineflayer bot",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-node test.ts"
   },
   "keywords": [
     "mineflayer",
@@ -13,11 +13,12 @@
   "author": "emberglaze",
   "license": "MIT",
   "devDependencies": {
+    "dotenv": "^16.3.1",
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "mineflayer-pathfinder": "^2.4.5",
     "mineflayer": "^4.14.0",
+    "mineflayer-pathfinder": "^2.4.5",
     "typescript": "^5.2.2"
   }
 }
